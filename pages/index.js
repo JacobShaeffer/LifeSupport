@@ -1,81 +1,43 @@
-import Head from 'next/head'
 import Link from 'next/link'
 import { getAllSectionData } from '../lib/sections'
+import Layout from '../components/layout'
+import clientPromise from '../lib/mongodb'
 
-export default function Home(props) {
+export default function Home({ sections, isConnected }) {
   return (
-    <div className="container">
-      <Head>
-        <title>Life Support</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+	<Layout>
+		<h1 className="title">
+			Life <span>Support</span>
+		</h1>
 
-      <main>
-        <h1 className="title">
-          Life <span>Support</span>
-        </h1>
+		<p className="description">
+			Mission critical information at your fingertips.
+			{isConnected ? (<span>Connected</span>) : (<span>ERROR</span>)}
+		</p>
 
-        <p className="description">
-          Mission critical information at your fingertips.
-        </p>
+		<div className="grid">
 
-        <div className="grid">
+			{sections.map((section) =>  {
+			return (
+				<div className='card' key={section.title}>
+				<h3>
+					<Link href={"/sections/" + section.id}>
+					<a>{section.title} &rarr;</a>
+					</Link>
+				</h3>
+				</div>
+			)
+			})}
 
-          {props.sections.map((section) =>  {
-            return (
-              <div className='card' key={section.title}>
-                <h3>
-                  <Link href={"/sections/" + section.id}>
-                    <a>{section.title} &rarr;</a>
-                  </Link>
-                </h3>
-              </div>
-            )
-          })}
+		</div>
 
-        </div>
-      </main>
-
-      <footer>
-        <span>
-          <strong>Omnicorp</strong> - Guiding the future of space faring!
-        </span>
-      </footer>
 
       <style jsx>{`
-        .container {
-          min-height: 100vh;
-          padding: 0 0.5rem;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
-
         main {
           padding: 5rem 0;
           flex: 1;
           display: flex;
           flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
-
-        footer {
-          width: 100%;
-          height: 100px;
-          border-top: 1px solid #eaeaea;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        footer img {
-          margin-left: 0.5rem;
-        }
-
-        footer a {
-          display: flex;
           justify-content: center;
           align-items: center;
         }
@@ -177,28 +139,22 @@ export default function Home(props) {
           }
         }
       `}</style>
-
-      <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-            sans-serif;
-        }
-
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
-    </div>
+	</Layout>
   )
 }
 
 export async function getServerSideProps(){
   const sections = getAllSectionData();
+  var isConnected = false;
+
+  try{
+	  const {db} = await clientPromise;
+	  isConnected = true;
+  } catch(e){
+	console.error(e);
+  }
+
   return {
-    props : {sections}
+    props : {sections, isConnected}
   };
 }

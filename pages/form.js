@@ -6,6 +6,7 @@ export default function Form(){
 
         const data = {
             val: event.target.val.value,
+			title: event.target.title.value,
         };
 
         const JSONdata = JSON.stringify(data);
@@ -25,6 +26,8 @@ export default function Form(){
 
     return (
         <form onSubmit={handleSubmit}>
+            <label htmlFor="title">Title:</label>
+            <input type="text" id="title" name="title"/>
             <label htmlFor="val">Val:</label>
             <input type="text" id="val" name="val"/>
             <button type="submit">Submit</button>
